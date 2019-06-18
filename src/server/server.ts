@@ -2,7 +2,7 @@ import { Count, Delete, Find, Insert, Update } from './common/crud';
 
 const exp = (global as any).exports;
 
-exp('insertMany', Insert);
+exp('insert', Insert);
 exp('insertOne', (params, callback) => {
     if (params !== null && typeof params === 'object') {
         params.documents = [params.document];
@@ -11,7 +11,7 @@ exp('insertOne', (params, callback) => {
     return Insert(params, callback);
 });
 
-exp('findMany', Find);
+exp('find', Find);
 exp('findOne', (params, callback) => {
   if (params !== null && typeof params === 'object') {
     params.limit = 1;
