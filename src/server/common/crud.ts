@@ -66,7 +66,7 @@ async function Find(params: { collection; query; options?; limit? }, callback) {
 
     const duration = Date.now() - start;
     if (duration > durationAllowed) {
-      console.warn(`[${new Date().toLocaleString()}] SLOW QUERY WARNING: Insert query took ${duration}ms.`);
+      console.warn(`[${new Date().toLocaleString()}] SLOW QUERY WARNING: Find query took ${duration}ms.`);
     }
   } catch (error) {
     console.error(`[${new Date().toLocaleString()}] ${error.stack}`);
@@ -101,7 +101,7 @@ async function Update(params: { collection; query; update; options? }, callback,
 
       const duration = Date.now() - start;
       if (duration > durationAllowed) {
-        console.warn(`[${new Date().toLocaleString()}] SLOW QUERY WARNING: Insert query took ${duration}ms.`);
+        console.warn(`[${new Date().toLocaleString()}] SLOW QUERY WARNING: Update query took ${duration}ms.`);
       }
     };
 
@@ -140,7 +140,7 @@ async function Count(params: { collection; query; options }, callback) {
 
       const duration = Date.now() - start;
       if (duration > durationAllowed) {
-        console.warn(`[${new Date().toLocaleString()}] SLOW QUERY WARNING: Insert query took ${duration}ms.`);
+        console.warn(`[${new Date().toLocaleString()}] SLOW QUERY WARNING: Count query took ${duration}ms.`);
       }
     });
   } catch (error) {
@@ -173,7 +173,7 @@ async function Delete(params: { collection; query; options }, callback, isDelete
       safeCallback(callback, true, res.result.n);
       const duration = Date.now() - start;
       if (duration > durationAllowed) {
-        console.warn(`[${new Date().toLocaleString()}] SLOW QUERY WARNING: Insert query took ${duration}ms.`);
+        console.warn(`[${new Date().toLocaleString()}] SLOW QUERY WARNING: Delete query took ${duration}ms.`);
       }
     };
 
