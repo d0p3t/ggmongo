@@ -14,13 +14,13 @@ async function Insert(params: { collection: string; documents: Array<{}> }, call
 
     const collection = DbClient.getParamsCollection(params);
     if (!collection) {
-      console.info(`[${new Date().toLocaleString()}] Couldn't find collection in params.`);
+      console.info(`[${new Date().toLocaleString()}] [DB] Couldn't find collection in params.`);
       return;
     }
 
     const documents = params.documents;
     if (!documents || !Array.isArray(documents)) {
-      console.info(`[${new Date().toLocaleString()}] Couldn't find documents in params.`);
+      console.info(`[${new Date().toLocaleString()}] [DB] Couldn't find documents in params.`);
       return;
     }
 
@@ -29,10 +29,10 @@ async function Insert(params: { collection: string; documents: Array<{}> }, call
 
     const duration = Date.now() - start;
     if (duration > durationAllowed) {
-      console.warn(`[${new Date().toLocaleString()}] SLOW QUERY WARNING: Insert query took ${duration}ms.`);
+      console.warn(`[${new Date().toLocaleString()}] [DB] SLOW QUERY WARNING: Insert query took ${duration}ms.`);
     }
   } catch (error) {
-    console.error(`[${new Date().toLocaleString()}] ${error.stack}`);
+    console.error(`[${new Date().toLocaleString()}] [DB] ${error.stack}`);
   }
 }
 
@@ -46,7 +46,7 @@ async function Find(params: { collection; query; options?; limit? }, callback) {
 
     const collection = DbClient.getParamsCollection(params);
     if (!collection) {
-      console.info(`[${new Date().toLocaleString()}] Couldn't find collection in params.`);
+      console.info(`[${new Date().toLocaleString()}] [DB] Couldn't find collection in params.`);
       return;
     }
 
@@ -66,10 +66,10 @@ async function Find(params: { collection; query; options?; limit? }, callback) {
 
     const duration = Date.now() - start;
     if (duration > durationAllowed) {
-      console.warn(`[${new Date().toLocaleString()}] SLOW QUERY WARNING: Find query took ${duration}ms.`);
+      console.warn(`[${new Date().toLocaleString()}] [DB] SLOW QUERY WARNING: Find query took ${duration}ms.`);
     }
   } catch (error) {
-    console.error(`[${new Date().toLocaleString()}] ${error.stack}`);
+    console.error(`[${new Date().toLocaleString()}] [DB] ${error.stack}`);
   }
 }
 
@@ -83,7 +83,7 @@ async function Update(params: { collection; query; update; options? }, callback,
 
     const collection = DbClient.getParamsCollection(params);
     if (!collection) {
-      console.info(`[${new Date().toLocaleString()}] Couldn't find collection in params.`);
+      console.info(`[${new Date().toLocaleString()}] [DB] Couldn't find collection in params.`);
       return;
     }
 
@@ -101,7 +101,9 @@ async function Update(params: { collection; query; update; options? }, callback,
 
       const duration = Date.now() - start;
       if (duration > durationAllowed) {
-        console.warn(`[${new Date().toLocaleString()}] SLOW QUERY WARNING: Update query took ${duration}ms.`);
+        console.warn(
+          `[${new Date().toLocaleString()}] [DB] SLOW QUERY WARNING: Update query took ${duration}ms.`,
+        );
       }
     };
 
@@ -109,7 +111,7 @@ async function Update(params: { collection; query; update; options? }, callback,
       ? await collection.updateOne(query, update, options, cb)
       : await collection.updateMany(query, update, options, cb);
   } catch (error) {
-    console.error(`[${new Date().toLocaleString()}] ${error.stack}`);
+    console.error(`[${new Date().toLocaleString()}] [DB] ${error.stack}`);
   }
 }
 
@@ -123,7 +125,7 @@ async function Count(params: { collection; query; options }, callback) {
 
     const collection = DbClient.getParamsCollection(params);
     if (!collection) {
-      console.log(`[${new Date().toLocaleString()}] Couldn't find collection in params.`);
+      console.log(`[${new Date().toLocaleString()}] [DB] Couldn't find collection in params.`);
       return;
     }
 
@@ -132,7 +134,7 @@ async function Count(params: { collection; query; options }, callback) {
 
     await collection.countDocuments(query, options, (err, count) => {
       if (err) {
-        console.error(`[${new Date().toLocaleString()}] count: Error ${err.message}`);
+        console.error(`[${new Date().toLocaleString()}] [DB] count: Error ${err.message}`);
         safeCallback(callback, false, err.message);
         return;
       }
@@ -140,11 +142,13 @@ async function Count(params: { collection; query; options }, callback) {
 
       const duration = Date.now() - start;
       if (duration > durationAllowed) {
-        console.warn(`[${new Date().toLocaleString()}] SLOW QUERY WARNING: Count query took ${duration}ms.`);
+        console.warn(
+          `[${new Date().toLocaleString()}] [DB] SLOW QUERY WARNING: Count query took ${duration}ms.`,
+        );
       }
     });
   } catch (error) {
-    console.error(`[${new Date().toLocaleString()}] ${error.stack}`);
+    console.error(`[${new Date().toLocaleString()}] [DB] ${error.stack}`);
   }
 }
 
@@ -158,7 +162,7 @@ async function Delete(params: { collection; query; options }, callback, isDelete
 
     const collection = DbClient.getParamsCollection(params);
     if (!collection) {
-      console.info(`[${new Date().toLocaleString()}] Couldn't find collection in params.`);
+      console.info(`[${new Date().toLocaleString()}] [DB] Couldn't find collection in params.`);
       return;
     }
 
@@ -166,20 +170,22 @@ async function Delete(params: { collection; query; options }, callback, isDelete
     const options = safeObjectArgument(params.options);
     const cb = (err, res) => {
       if (err) {
-        console.error(`[${new Date().toLocaleString()}] delete: Error ${err.message}`);
+        console.error(`[${new Date().toLocaleString()}] [DB] delete: Error ${err.message}`);
         safeCallback(callback, false, err.message);
         return;
       }
       safeCallback(callback, true, res.result.n);
       const duration = Date.now() - start;
       if (duration > durationAllowed) {
-        console.warn(`[${new Date().toLocaleString()}] SLOW QUERY WARNING: Delete query took ${duration}ms.`);
+        console.warn(
+          `[${new Date().toLocaleString()}] [DB] SLOW QUERY WARNING: Delete query took ${duration}ms.`,
+        );
       }
     };
 
     isDeleteOne ? await collection.deleteOne(query, options, cb) : await collection.deleteMany(query, options, cb);
   } catch (error) {
-    console.error(`[${new Date().toLocaleString()}] ${error.stack}`);
+    console.error(`[${new Date().toLocaleString()}] [DB] ${error.stack}`);
   }
 }
 
