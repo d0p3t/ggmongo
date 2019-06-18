@@ -16,7 +16,7 @@ class DbClient {
         await this.client.connect();
         this.db = this.client.db('gungame');
         this.initialized = true;
-        console.info(`[${new Date().toLocaleString()}] Connected to Database`);
+        console.info(`[${new Date().toLocaleString()}] [DB] Connected to Database`);
       } catch (error) {
         console.error(error.stack);
       }
@@ -27,9 +27,9 @@ class DbClient {
   public async close() {
     try {
       await this.client.close();
-      console.info(`[${new Date().toLocaleString()}] Disconnected from Database`);
+      console.info(`[${new Date().toLocaleString()}] [DB] Disconnected from Database`);
     } catch (error) {
-      console.error(`[${new Date().toLocaleString()}] close: Error ${error.message}`);
+      console.error(`[${new Date().toLocaleString()}] [DB] close: Error ${error.message}`);
     }
   }
 
