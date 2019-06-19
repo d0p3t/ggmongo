@@ -1,14 +1,14 @@
-import { Count, Delete, Find, Insert, Update } from './common/crud';
+import { BulkUpdate, Count, Delete, Find, Insert, Update } from './common/crud';
 
 const exp = (global as any).exports;
 
 exp('insert', Insert);
 exp('insertOne', (params, callback) => {
-    if (params !== null && typeof params === 'object') {
-        params.documents = [params.document];
-        params.document = null;
-    }
-    return Insert(params, callback);
+  if (params !== null && typeof params === 'object') {
+    params.documents = [params.document];
+    params.document = null;
+  }
+  return Insert(params, callback);
 });
 
 exp('find', Find);
@@ -30,3 +30,5 @@ exp('deleteOne', (params, callback) => {
 });
 
 exp('count', Count);
+
+exp('bulkUpdate', BulkUpdate);

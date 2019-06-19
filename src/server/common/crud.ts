@@ -57,7 +57,7 @@ async function Find(params: { collection; query; options?; limit? }, callback) {
     if (params.limit) {
       cursor = cursor.limit(params.limit);
     }
-    let documents: any[] = [];
+    const documents: any[] = [];
     while (await cursor.hasNext()) {
       const doc = await cursor.next();
       documents.push(doc);
@@ -101,9 +101,7 @@ async function Update(params: { collection; query; update; options? }, callback,
 
       const duration = Date.now() - start;
       if (duration > durationAllowed) {
-        console.warn(
-          `[${new Date().toLocaleString()}] [DB] SLOW QUERY WARNING: Update query took ${duration}ms.`,
-        );
+        console.warn(`[${new Date().toLocaleString()}] [DB] SLOW QUERY WARNING: Update query took ${duration}ms.`);
       }
     };
 
@@ -142,9 +140,7 @@ async function Count(params: { collection; query; options }, callback) {
 
       const duration = Date.now() - start;
       if (duration > durationAllowed) {
-        console.warn(
-          `[${new Date().toLocaleString()}] [DB] SLOW QUERY WARNING: Count query took ${duration}ms.`,
-        );
+        console.warn(`[${new Date().toLocaleString()}] [DB] SLOW QUERY WARNING: Count query took ${duration}ms.`);
       }
     });
   } catch (error) {
@@ -177,9 +173,7 @@ async function Delete(params: { collection; query; options }, callback, isDelete
       safeCallback(callback, true, res.result.n);
       const duration = Date.now() - start;
       if (duration > durationAllowed) {
-        console.warn(
-          `[${new Date().toLocaleString()}] [DB] SLOW QUERY WARNING: Delete query took ${duration}ms.`,
-        );
+        console.warn(`[${new Date().toLocaleString()}] [DB] SLOW QUERY WARNING: Delete query took ${duration}ms.`);
       }
     };
 
@@ -189,8 +183,41 @@ async function Delete(params: { collection; query; options }, callback, isDelete
   }
 }
 
+async function BulkUpdate(params: { collection; queries: Array<{ query; update }> }, callback) {
+  try {
+    do {
+      await Wait(0);
+    } while (!DbClient.initialized);
+
+    const start = Date.now();
+
+    const collection = DbClient.getParamsCollection(params);
+
+    const bulk = collection.initializeUnorderedBulkOp();
+
+    const queries = safeObjectArgument(params.queries);
+    queries.forEach(doc => {
+      const query = safeObjectArgument(doc.query);
+      const update = safeObjectArgument(doc.update);
+      bulk
+        .find(query)
+        .upsert()
+        .updateOne(update);
+    });
+
+    const result = await bulk.execute();
+    safeCallback(callback, true, result.nUpdated);
+    const duration = Date.now() - start;
+    if (duration > durationAllowed) {
+      console.warn(`[${new Date().toLocaleString()}] [DB] SLOW QUERY WARNING: Delete query took ${duration}ms.`);
+    }
+  } catch (error) {
+    console.error(`[${new Date().toLocaleString()}] [DB] ${error.stack}`);
+  }
+}
+
 setImmediate(async () => {
   await DbClient.connect();
 });
 
-export { Count, Delete, Find, Insert, Update };
+export { BulkUpdate, Count, Delete, Find, Insert, Update };
