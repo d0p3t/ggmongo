@@ -32,3 +32,13 @@ exp('deleteOne', (params, callback) => {
 exp('count', Count);
 
 exp('bulkUpdate', BulkUpdate);
+
+on('onServerResourceStart', async (resourceName: string) => {
+  if (GetCurrentResourceName() !== resourceName) {
+    return;
+  }
+
+  await Count({ collection: 'user', query: {}, options: {} }, () => {
+    console.warn(`[${new Date().toLocaleString()}] [DB] IGNORE SLOW QUERY WARNING: First query`);
+  });
+});
