@@ -9,6 +9,7 @@ async function Insert(params: { collection: string; documents: Array<{}> }, call
     do {
       await Wait(0);
     } while (!DbClient.initialized);
+    console.info(`[${new Date().toLocaleString()}] [DB] ggmongo - Insert query`);
 
     const start = Date.now();
 
@@ -41,6 +42,7 @@ async function Find(params: { collection; query; options?; limit? }, callback) {
     do {
       await Wait(0);
     } while (!DbClient.initialized);
+    console.info(`[${new Date().toLocaleString()}] [DB] ggmongo - Find query`);
 
     const start = Date.now();
 
@@ -78,6 +80,7 @@ async function Update(params: { collection; query; update; options? }, callback,
     do {
       await Wait(0);
     } while (!DbClient.initialized);
+    console.info(`[${new Date().toLocaleString()}] [DB] ggmongo - Update query`);
 
     const start = Date.now();
 
@@ -118,6 +121,7 @@ async function Count(params: { collection; query; options }, callback) {
     do {
       await Wait(0);
     } while (!DbClient.initialized);
+    console.info(`[${new Date().toLocaleString()}] [DB] ggmongo - Count query`);
 
     const start = Date.now();
 
@@ -153,6 +157,7 @@ async function Delete(params: { collection; query; options }, callback, isDelete
     do {
       await Wait(0);
     } while (!DbClient.initialized);
+    console.info(`[${new Date().toLocaleString()}] [DB] ggmongo - Delete query`);
 
     const start = Date.now();
 
@@ -188,6 +193,7 @@ async function BulkUpdate(params: { collection; queries: Array<{ query; update }
     do {
       await Wait(0);
     } while (!DbClient.initialized);
+    console.info(`[${new Date().toLocaleString()}] [DB] ggmongo - BulkUpdate query`);
 
     const start = Date.now();
 
@@ -195,18 +201,16 @@ async function BulkUpdate(params: { collection; queries: Array<{ query; update }
 
     const bulk = collection.initializeUnorderedBulkOp();
 
-    const queries = safeObjectArgument(params.queries);
-    queries.forEach(doc => {
+    // const queries = safeObjectArgument(params.queries);
+    // console.log(params.queries);
+    params.queries.forEach(doc => {
       const query = safeObjectArgument(doc.query);
       const update = safeObjectArgument(doc.update);
-      bulk
-        .find(query)
-        .upsert()
-        .updateOne(update);
+      bulk.find(query).updateOne(update);
     });
 
     const result = await bulk.execute();
-    safeCallback(callback, true, result.nUpdated);
+    safeCallback(callback, true, result.nModified);
     const duration = Date.now() - start;
     if (duration > durationAllowed) {
       console.warn(`[${new Date().toLocaleString()}] [DB] SLOW QUERY WARNING: Delete query took ${duration}ms.`);
